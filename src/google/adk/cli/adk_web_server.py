@@ -74,6 +74,7 @@ from ..events.event import Event
 from ..memory.base_memory_service import BaseMemoryService
 from ..runners import Runner
 from ..sessions.base_session_service import BaseSessionService
+from ..sessions.base_session_service import GetSessionConfig
 from ..sessions.session import Session
 from ..utils.context_utils import Aclosing
 from .cli_eval import EVAL_SESSION_ID_PREFIX
@@ -164,6 +165,7 @@ class RunAgentRequest(common.BaseModel):
   new_message: types.Content
   streaming: bool = False
   state_delta: Optional[dict[str, Any]] = None
+  get_session_config: Optional[GetSessionConfig] = None
 
 
 class CreateSessionRequest(common.BaseModel):
@@ -1021,6 +1023,7 @@ class AdkWebServer:
               session_id=req.session_id,
               new_message=req.new_message,
               state_delta=req.state_delta,
+              get_session_config=req.get_session_config,
           )
       ) as agen:
         events = [event async for event in agen]
@@ -1051,6 +1054,7 @@ class AdkWebServer:
                   new_message=req.new_message,
                   state_delta=req.state_delta,
                   run_config=RunConfig(streaming_mode=stream_mode),
+                  get_session_config=req.get_session_config,
               )
           ) as agen:
             async for event in agen:
